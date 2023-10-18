@@ -3,26 +3,33 @@ import 'package:provider/provider.dart';
 
 import '../controller/auth_provider.dart';
 
-class LOginPage extends StatelessWidget {
+class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  LOginPage({super.key});
+  LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    // Function to handle the login process
+    // Check if the user is already authenticated using shared_preferences
+    final isAuthenticated = authProvider.isAuthenticated;
+
+    if (isAuthenticated) {
+      // Redirect to the homepage if already authenticated
+      Navigator.pushReplacementNamed(context, '/homepage');
+    }
     void handleLogin() {
       final email = emailController.text;
       final password = passwordController.text;
 
       authProvider.login(email, password).then((_) {
         if (authProvider.isAuthenticated) {
-          Navigator.pushReplacementNamed(context, '/homepage'); // Redirect to the homepage if the login is successful
+          Navigator.pushReplacementNamed(context, '/homepage');
         }
       }).catchError((error) {
-        // Handle login error, e.g., show an error message in a SnackBar
+        // Handle login error, e.g., show an error message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
@@ -55,7 +62,7 @@ class LOginPage extends StatelessWidget {
                       width: 0.5, // Thickness of the underline
                     ),
                   ),
-                ),
+                ), // Make the container take up the full screen width
                 child: const Padding(
                   padding: EdgeInsets.only(bottom: 12),
                   child: Text(
@@ -72,18 +79,23 @@ class LOginPage extends StatelessWidget {
                 controller: emailController,
                 decoration: InputDecoration(
                   hintText: 'E-mail',
-                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                  suffixIcon: Icon(Icons.email_rounded, color: Colors.grey.shade400),
+                  hintStyle:
+                      TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                  suffixIcon:
+                      Icon(Icons.email_rounded, color: Colors.grey.shade400),
                   filled: true,
                   fillColor: Colors.grey.shade100,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                 ),
               ),
@@ -92,18 +104,23 @@ class LOginPage extends StatelessWidget {
                 controller: passwordController,
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                  suffixIcon: Icon(Icons.remove_red_eye, color: Colors.grey.shade400),
+                  hintStyle:
+                      TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                  suffixIcon:
+                      Icon(Icons.remove_red_eye, color: Colors.grey.shade400),
                   filled: true,
                   fillColor: Colors.grey.shade100,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                 ),
               ),
@@ -118,11 +135,14 @@ class LOginPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 50.0),
+              SizedBox(
+                height: screenHeight / 12,
+              ),
               ElevatedButton(
                 onPressed: () {
-                  if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-                    // Show an error message in a SnackBar if fields are empty
+                  if (emailController.text.isEmpty ||
+                      passwordController.text.isEmpty) {
+                    // Show an error message in a SnackBar.
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: Colors.red,
@@ -130,13 +150,13 @@ class LOginPage extends StatelessWidget {
                       ),
                     );
                   } else {
-                    handleLogin(); // Call the login function if fields are not empty
+                    handleLogin();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: Colors.blue,
                         duration: Duration(seconds: 1),
                         content: Text(
-                          'Signing in, please wait',
+                          'signing in please wait',
                         ),
                       ),
                     );

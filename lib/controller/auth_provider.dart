@@ -2,15 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class AuthProvider with ChangeNotifier {
-  String? authToken; // This variable holds the authentication token after a successful login.
-  bool get isAuthenticated => authToken != null; // Returns true if the user is authenticated.
+  String? authToken;
+  bool get isAuthenticated => authToken != null;
+
+  AuthProvider(String? authToken) {
+    // Initialize the authToken from shared_preferences when the app starts
+    _initAuthToken();
+  }
 
   Future<void> login(String email, String password) async {
-    notifyListeners(); // Notifies listeners that the state of this provider is changing.
-
-    final url = Uri.parse('https://spotit.cloud/interview/api/login'); // Defines the URL for the login API.
-    final response = await http.post( // Sends a POST request to the login API.
+    final url = Uri.parse('https://spotit.cloud/interview/api/login');
+    final response = await http.post(
       url,
       body: jsonEncode({
         'email': email,
@@ -21,24 +26,41 @@ class AuthProvider with ChangeNotifier {
       },
     );
 
-    print('Login response status code: ${response.statusCode}'); // Logs the HTTP status code of the login response.
-    print('Login response body: ${response.body}'); // Logs the response body for debugging.
-
     if (response.statusCode == 200) {
-      authToken = jsonDecode(response.body)['data']['token']; // Extracts the authentication token from the response.
-      notifyListeners(); // Notifies listeners that the authentication state has changed.
-      print('Authentication token: $authToken'); // Logs the authentication token.
+      authToken = jsonDecode(response.body)['data']['token'];
+      // Save the authentication token to shared_preferences
+      await _saveAuthToken(authToken);
+      notifyListeners();
     } else {
-      print('Login failed. Error message: ${response.body}'); // Logs an error message if login fails.
-      throw Exception('Login failed'); // Throws an exception to indicate a login failure.
+      throw Exception('Login failed');
     }
-
-   // notifyListeners(); 
   }
 
   void logout() {
-    authToken = null; // Clears the authentication token when the user logs out.
+    authToken = null;
 
-    notifyListeners(); // Notifies listeners that the authentication state has changed (logged out).
+    _removeAuthToken();
+
+    notifyListeners();
+  }
+
+  // Helper function to save the authentication token to shared_preferences
+  Future<void> _saveAuthToken(String? token) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('auth_token', token ?? '');
+    print(token);
+  }
+
+  // Helper function to get the authentication token from shared_preferences
+  Future<void> _initAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    authToken = prefs.getString('auth_token');
+    notifyListeners();
+  }
+
+  // Helper function to remove the authentication token from shared_preferences
+  Future<void> _removeAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('auth_token');
   }
 }

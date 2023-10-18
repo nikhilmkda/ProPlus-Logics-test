@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class ExpandedProduct extends StatelessWidget {
   const ExpandedProduct({
     super.key,
@@ -19,6 +18,7 @@ class ExpandedProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 65,
@@ -137,8 +137,8 @@ class ExpandedProduct extends StatelessWidget {
                               fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  const SizedBox(
-                    height: 40,
+                  SizedBox(
+                    height: screenHeight / 14,
                   ),
                   SizedBox(
                     width: double.infinity,
@@ -157,7 +157,7 @@ class ExpandedProduct extends StatelessWidget {
                       child: const Text('Buy Now'),
                     ),
                   ),
-               const   SizedBox(height: 18),
+                  const SizedBox(height: 18),
                   SizedBox(
                     width: double.infinity,
                     height: 45,
@@ -176,13 +176,13 @@ class ExpandedProduct extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                        const  Text(
+                          const Text(
                             'Add to Cart',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                       const   SizedBox(width: 10), // Add some spacing
+                          const SizedBox(width: 10), // Add some spacing
                           Icon(
                             Icons.shopping_cart_outlined,
                             color: Colors.red.shade800,

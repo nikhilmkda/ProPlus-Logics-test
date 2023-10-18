@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../controller/auth_provider.dart';
@@ -356,7 +357,9 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                       );
                     } else {
                       //postProductsProvider.postProductData();
-
+                      // Get the authToken from SharedPreferences
+                      final prefs = await SharedPreferences.getInstance();
+                      final authToken = prefs.getString('auth_token');
                       Workmanager().registerOneOffTask(
                         'postProductData',
                         'simpleTaskKey',
@@ -367,7 +370,6 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                               authToken, // Make sure authToken is defined
                         },
                       );
-                     
 
                       // Provide feedback to the user, indicating that the upload task is in progress.
                       ScaffoldMessenger.of(context).showSnackBar(

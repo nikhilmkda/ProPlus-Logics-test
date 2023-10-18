@@ -41,6 +41,7 @@ dependencies:
   dio: ^5.3.3
   workmanager: ^0.5.1
   video_player: ^2.7.2
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

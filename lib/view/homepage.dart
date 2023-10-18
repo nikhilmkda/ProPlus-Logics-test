@@ -1,14 +1,22 @@
-import 'package:ecommerce/view/product_expanded.dart';
+import 'package:ecommerce/view/product_expanded_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
+import '../controller/auth_provider.dart';
 import '../controller/product_list_provider.dart';
 import '../controller/upload_products_provider.dart';
+import 'login_screen.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   // Function to build a widget that displays either an image or video
   Widget buildProductImage(String imageUrl) {
     if (imageUrl.endsWith('.mp4')) {
@@ -37,11 +45,24 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  void initData(BuildContext context) async {
+    final productProvider =
+        Provider.of<ProductListProvider>(context, listen: false);
+    await productProvider.fetchData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initData(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Access the ProductProvider
     final productProvider = Provider.of<ProductListProvider>(context);
     final uploadProductsProvider = Provider.of<UploadProductsProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -51,11 +72,24 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(
+              Icons.logout,
+              color: Colors.black,
+            ),
+            onPressed: () async {
+              authProvider.logout();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(
               Icons.replay_outlined,
               color: Colors.black,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/homepage');
+              initData(context);
             },
           ),
           IconButton(
