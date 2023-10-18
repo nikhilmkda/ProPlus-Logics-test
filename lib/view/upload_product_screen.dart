@@ -27,20 +27,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
         appBar: AppBar(
           toolbarHeight: 65,
           backgroundColor: Colors.white,
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                postProductsProvider.clearControllers();
-                Navigator.pushNamed(context, '/homepage');
-              },
-            ),
-          ],
           leading: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_ios_new,
               color: Colors.black,
             ),
@@ -48,7 +36,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
               Navigator.of(context).pop();
             },
           ),
-          title: Text(
+          title: const Text(
             "Post Product",
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
@@ -63,23 +51,22 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 height: 20,
               ),
               Container(
-                width: double
-                    .infinity, // Make the container take up the full screen width
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.black, // Color of the underline
+                      width: 0.5, // Thickness of the underline
+                    ),
+                  ),
+                ), // Make the container take up the full screen width
+                child: const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
                   child: Text(
                     'Enter Your Details',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.black, // Color of the underline
-                      width: 0.5, // Thickness of the underline
                     ),
                   ),
                 ),
@@ -123,9 +110,9 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 height: 30,
               ),
               Padding(
-                padding: EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: RichText(
-                    text: TextSpan(children: [
+                    text: const TextSpan(children: [
                   TextSpan(
                     text: "*",
                     style: TextStyle(
@@ -168,9 +155,9 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 height: 30,
               ),
               Padding(
-                padding: EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: RichText(
-                    text: TextSpan(children: [
+                    text: const TextSpan(children: [
                   TextSpan(
                     text: "*",
                     style: TextStyle(
@@ -214,9 +201,9 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 height: 30,
               ),
               Padding(
-                padding: EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: RichText(
-                    text: TextSpan(children: [
+                    text: const TextSpan(children: [
                   TextSpan(
                     text: "*",
                     style: TextStyle(
@@ -284,7 +271,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                             Icons.replay_outlined,
                             color: Colors.red.shade700,
                           ),
-                          SizedBox(width: 8.0),
+                          const SizedBox(width: 8.0),
                           Text(
                             'Re-Upload',
                             style: TextStyle(color: Colors.red.shade900),
@@ -333,7 +320,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                           Icons.file_upload_outlined,
                           color: Colors.red.shade700,
                         ),
-                        SizedBox(width: 8.0),
+                        const SizedBox(width: 8.0),
                         Text(
                           'Upload product image/ video',
                           style: TextStyle(color: Colors.red.shade900),
@@ -345,7 +332,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
               const SizedBox(
                 height: 40,
               ),
-              Container(
+              SizedBox(
                 width: 400.0,
                 height: 45,
                 child: ElevatedButton(
@@ -362,22 +349,25 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                         productDescription.isEmpty) {
                       // Show an error message in a SnackBar.
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           backgroundColor: Colors.red,
                           content: Text('Please fill in all required fields.'),
                         ),
                       );
                     } else {
-                      //  postProductsProvider.postProductData();
+                      //postProductsProvider.postProductData();
 
                       Workmanager().registerOneOffTask(
                         'postProductData',
                         'simpleTaskKey',
+                        initialDelay: const Duration(
+                            seconds: 10), // Add a delay if needed
                         inputData: <String, dynamic>{
-                          'authToken': authToken,
+                          'authToken':
+                              authToken, // Make sure authToken is defined
                         },
                       );
-                      // postProductsProvider.postProductData();
+                      //   print('Post button pressed with authToken: $authToken');
 
                       // Provide feedback to the user, indicating that the upload task is in progress.
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -404,8 +394,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                     ),
                   ),
                   child: postProductsProvider.isPosting
-                      ? CircularProgressIndicator() // Show a circular progress indicator
-                      : Row(
+                      ? const CircularProgressIndicator() // Show a circular progress indicator
+                      : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(

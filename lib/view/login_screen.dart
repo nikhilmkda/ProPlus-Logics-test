@@ -21,6 +21,12 @@ class LOginPage extends StatelessWidget {
         }
       }).catchError((error) {
         // Handle login error, e.g., show an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Login failed. Please check your credentials.'),
+          ),
+        );
       });
     }
 
@@ -40,22 +46,22 @@ class LOginPage extends StatelessWidget {
               const SizedBox(height: 10.0),
               Container(
                 width: double
-                    .infinity, // Make the container take up the full screen width
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                    .infinity,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.black, // Color of the underline
+                      width: 0.5, // Thickness of the underline
+                    ),
+                  ),
+                ), // Make the container take up the full screen width
+                child: const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
                   child: Text(
                     'Sign in',
                     style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.black, // Color of the underline
-                      width: 0.5, // Thickness of the underline
                     ),
                   ),
                 ),
@@ -124,7 +130,27 @@ class LOginPage extends StatelessWidget {
               const SizedBox(height: 50.0),
               ElevatedButton(
                 onPressed: () {
-                  handleLogin();
+                  if (emailController.text.isEmpty ||
+                      passwordController.text.isEmpty) {
+                    // Show an error message in a SnackBar.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please fill in all required fields.'),
+                      ),
+                    );
+                  } else {
+                    handleLogin();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.blue,
+                        duration: Duration(seconds: 1),
+                        content: Text(
+                          'signing in please wait',
+                        ),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
@@ -133,15 +159,13 @@ class LOginPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                child: authProvider.isAuthenticated
-                    ? CircularProgressIndicator()
-                    : const Text(
-                        'Sign In',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.0,
-                        ),
-                      ),
+                child: const Text(
+                  'Sign In',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                  ),
+                ),
               ),
             ],
           ),

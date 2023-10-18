@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../model/product_model.dart';
 
 class ExpandedProduct extends StatelessWidget {
   const ExpandedProduct({
@@ -24,19 +23,8 @@ class ExpandedProduct extends StatelessWidget {
       appBar: AppBar(
         toolbarHeight: 65,
         backgroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.home,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              Navigator.pushNamed(context, '/homepage');
-            },
-          ),
-        ],
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios_new,
             color: Colors.black,
           ),
@@ -44,7 +32,7 @@ class ExpandedProduct extends StatelessWidget {
             Navigator.of(context).pop();
           },
         ),
-        title: Text(
+        title: const Text(
           "Product details",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
@@ -54,7 +42,7 @@ class ExpandedProduct extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
               height: 250,
               child: Image.network(
@@ -70,20 +58,20 @@ class ExpandedProduct extends StatelessWidget {
                 },
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Name: $name',
-                      style: TextStyle(
+                  Text(name,
+                      style: const TextStyle(
                           color: Colors.black,
                           fontSize: 25,
                           fontWeight: FontWeight.bold)),
-                  SizedBox(
+                  const SizedBox(
                     height: 28,
                   ),
                   Text('₹ ${price.toStringAsFixed(2)}',
@@ -91,8 +79,8 @@ class ExpandedProduct extends StatelessWidget {
                           color: Colors.red.shade800,
                           fontSize: 25,
                           fontWeight: FontWeight.bold)),
-                  SizedBox(height: 35),
-                  Row(
+                  const SizedBox(height: 35),
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
@@ -113,43 +101,43 @@ class ExpandedProduct extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(bottom: BorderSide(color: Colors.black)),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text('Product ID - ',
+                      const Text('Product ID - ',
                           style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold)),
-                      Text('$id',
-                          style: TextStyle(
+                      Text(id,
+                          style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text('Description - ',
+                      const Text('Description - ',
                           style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold)),
-                      Text('$description',
-                          style: TextStyle(
+                      Text(description,
+                          style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 40,
                   ),
                   SizedBox(
@@ -166,10 +154,10 @@ class ExpandedProduct extends StatelessWidget {
                           borderRadius: BorderRadius.circular(25),
                         ),
                       ),
-                      child: Text('Buy Now'),
+                      child: const Text('Buy Now'),
                     ),
                   ),
-                  SizedBox(height: 18),
+               const   SizedBox(height: 18),
                   SizedBox(
                     width: double.infinity,
                     height: 45,
@@ -188,13 +176,13 @@ class ExpandedProduct extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                        const  Text(
                             'Add to Cart',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 10), // Add some spacing
+                       const   SizedBox(width: 10), // Add some spacing
                           Icon(
                             Icons.shopping_cart_outlined,
                             color: Colors.red.shade800,

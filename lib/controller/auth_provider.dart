@@ -6,9 +6,9 @@ class AuthProvider with ChangeNotifier {
   String? authToken;
   bool get isAuthenticated => authToken != null;
 
-  bool loginsuccess = false;
-
   Future<void> login(String email, String password) async {
+    notifyListeners();
+
     final url = Uri.parse('https://spotit.cloud/interview/api/login');
     final response = await http.post(
       url,
@@ -26,20 +26,19 @@ class AuthProvider with ChangeNotifier {
 
     if (response.statusCode == 200) {
       authToken = jsonDecode(response.body)['data']['token'];
-      loginsuccess = true;
-      print('Authentication token: $authToken');
-
       notifyListeners();
+      print('Authentication token: $authToken');
     } else {
-      loginsuccess = false;
       print('Login failed. Error message: ${response.body}');
       throw Exception('Login failed');
     }
+
+    notifyListeners();
   }
 
   void logout() {
     authToken = null;
-    loginsuccess = false;
+
     notifyListeners();
   }
 }

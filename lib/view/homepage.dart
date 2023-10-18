@@ -1,14 +1,47 @@
 import 'package:ecommerce/view/product_expanded.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 import '../controller/product_list_provider.dart';
+import '../controller/upload_products_provider.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  // Function to build a widget that displays either an image or video
+  Widget buildProductImage(String imageUrl) {
+    if (imageUrl.endsWith('.mp4')) {
+      // Display video if the URL ends with '.mp4'
+      final videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(imageUrl));
+      return AspectRatio(
+        aspectRatio: 16 / 9, // Adjust the aspect ratio as needed
+        child: VideoPlayer(videoPlayerController),
+      );
+    } else {
+      // Display image for other cases
+      return Image.network(
+        imageUrl,
+        width: 150,
+        height: 100,
+        errorBuilder: (context, error, stackTrace) {
+          // Display a placeholder image or an error message
+          return Image.asset(
+            'assets/errorImage.png',
+            width: 150,
+            height: 100,
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Access the ProductProvider
     final productProvider = Provider.of<ProductListProvider>(context);
+    final uploadProductsProvider = Provider.of<UploadProductsProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -17,17 +50,27 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: Icon(
+            icon: const Icon(
+              Icons.replay_outlined,
+              color: Colors.black,
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/homepage');
+            },
+          ),
+          IconButton(
+            icon: const Icon(
               Icons.add_to_photos_sharp,
               color: Colors.black,
             ),
             onPressed: () {
+              uploadProductsProvider.clearControllers();
               Navigator.pushNamed(context, '/postProductScreen');
             },
           ),
         ],
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios_new,
             color: Colors.black,
           ),
@@ -35,7 +78,7 @@ class HomePage extends StatelessWidget {
             Navigator.of(context).pop();
           },
         ),
-        title: Text(
+        title: const Text(
           "Product listing",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
@@ -45,7 +88,7 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             TextField(
               decoration: InputDecoration(
                 hintText: 'search for car models/brands',
@@ -69,14 +112,36 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             FutureBuilder(
               future: productProvider.fetchData(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError ||
+                    productProvider.hasNetworkError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/noresult.png',
+                          width: 400,
+                          height: 400,
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          productProvider.hasNetworkError
+                              ? 'Failed to load data, check your internet connection'
+                              : 'Error: ${snapshot.error}',
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  );
                 } else {
                   // Build the grid view using the fetched data
                   final products = productProvider
@@ -84,8 +149,9 @@ class HomePage extends StatelessWidget {
                   return Expanded(
                     child: GridView.builder(
                       // physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, childAspectRatio: 0.9),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, childAspectRatio: 0.9),
                       itemCount: products.length,
                       itemBuilder: (context, index) {
                         final product = products[index];
@@ -112,40 +178,28 @@ class HomePage extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Image.network(
-                                    product.productImage,
-                                    width: 150,
-                                    height: 100,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      // Display a placeholder image or an error message
-                                      return Image.asset(
-                                        'assets/errorImage.png',
-                                        width: 150,
-                                        height: 100,
-                                      );
-                                    },
-                                  ),
+                                  buildProductImage(product.productImage),
                                   Text(
-                                    '${product.productCode}',
-                                    style: TextStyle(
+                                    product.productCode,
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Text(
-                                    '${product.productName}',
-                                    style: TextStyle(
+                                    product.productName,
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Text(
                                     '${product.mrp}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
                                   ),

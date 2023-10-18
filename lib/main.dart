@@ -13,7 +13,6 @@ import 'controller/product_list_provider.dart';
 void callbackDispatcher(String task, Map<String, dynamic> inputData) {
   // Now you can access inputData, including the 'authToken'.
   final authToken = inputData['authToken'];
-  print(authToken);
 
   // Check if the authToken is not null before proceeding.
   if (authToken != null) {
@@ -62,7 +61,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LOginPage(),
-        '/homepage': (context) => HomePage(),
+        '/homepage': (context) => const HomePage(),
         '/postProductScreen': (context) => const UploadProductScreen(),
       },
     );
