@@ -5,7 +5,7 @@ This README provides an overview of the structure and functionality of the E-Com
 ## App Overview
 
 The E-Commerce app is designed for online shopping and product listing. It includes features such as user authentication, product posting, and product browsing.
-##App Structure
+## App Structure
 The app is structured as follows:
 
 lib: This directory contains the main source code for the app.
@@ -14,7 +14,7 @@ view: Contains the app's screens and UI components.
 main.dart: The entry point of the app.
 workmanager.dart: Background task dispatcher for background product posting.
 
-#App Screens
+# App Screens
 The E-Commerce app includes the following screens:
 
 Login Screen (LOginPage): Allows users to log in with their credentials. User authentication is handled by the AuthProvider class.
@@ -25,7 +25,7 @@ Product Details Screen (ExpandedProduct): Displays Details of products available
 
 Product Posting Screen (UploadProductScreen): Allows authenticated users to post new products. Product data is posted in the background using the Workmanager package.
 
-#Background Task
+# Background Task
 The workmanager.dart file is used to execute background tasks for posting product data. It dispatches background tasks to post product data based on an authentication token.
 
 ## Dependencies
