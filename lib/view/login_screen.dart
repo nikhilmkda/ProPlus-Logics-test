@@ -11,16 +11,18 @@ class LOginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Function to handle the login process
     void handleLogin() {
       final email = emailController.text;
       final password = passwordController.text;
 
       authProvider.login(email, password).then((_) {
         if (authProvider.isAuthenticated) {
-          Navigator.pushReplacementNamed(context, '/homepage');
+          Navigator.pushReplacementNamed(context, '/homepage'); // Redirect to the homepage if the login is successful
         }
       }).catchError((error) {
-        // Handle login error, e.g., show an error message
+        // Handle login error, e.g., show an error message in a SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,
@@ -45,8 +47,7 @@ class LOginPage extends StatelessWidget {
               ),
               const SizedBox(height: 10.0),
               Container(
-                width: double
-                    .infinity,
+                width: double.infinity,
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
@@ -54,7 +55,7 @@ class LOginPage extends StatelessWidget {
                       width: 0.5, // Thickness of the underline
                     ),
                   ),
-                ), // Make the container take up the full screen width
+                ),
                 child: const Padding(
                   padding: EdgeInsets.only(bottom: 12),
                   child: Text(
@@ -71,23 +72,18 @@ class LOginPage extends StatelessWidget {
                 controller: emailController,
                 decoration: InputDecoration(
                   hintText: 'E-mail',
-                  hintStyle:
-                      TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                  suffixIcon:
-                      Icon(Icons.email_rounded, color: Colors.grey.shade400),
+                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                  suffixIcon: Icon(Icons.email_rounded, color: Colors.grey.shade400),
                   filled: true,
                   fillColor: Colors.grey.shade100,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                 ),
               ),
@@ -96,23 +92,18 @@ class LOginPage extends StatelessWidget {
                 controller: passwordController,
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  hintStyle:
-                      TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                  suffixIcon:
-                      Icon(Icons.remove_red_eye, color: Colors.grey.shade400),
+                  hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                  suffixIcon: Icon(Icons.remove_red_eye, color: Colors.grey.shade400),
                   filled: true,
                   fillColor: Colors.grey.shade100,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                        BorderSide(color: Colors.grey.shade300, width: 2),
+                    borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
                   ),
                 ),
               ),
@@ -130,9 +121,8 @@ class LOginPage extends StatelessWidget {
               const SizedBox(height: 50.0),
               ElevatedButton(
                 onPressed: () {
-                  if (emailController.text.isEmpty ||
-                      passwordController.text.isEmpty) {
-                    // Show an error message in a SnackBar.
+                  if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+                    // Show an error message in a SnackBar if fields are empty
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: Colors.red,
@@ -140,13 +130,13 @@ class LOginPage extends StatelessWidget {
                       ),
                     );
                   } else {
-                    handleLogin();
+                    handleLogin(); // Call the login function if fields are not empty
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: Colors.blue,
                         duration: Duration(seconds: 1),
                         content: Text(
-                          'signing in please wait',
+                          'Signing in, please wait',
                         ),
                       ),
                     );

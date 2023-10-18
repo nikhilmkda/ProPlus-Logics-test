@@ -12,23 +12,22 @@ class UploadProductsProvider with ChangeNotifier {
   String? selectedImage;
   bool _isPostSuccessful = false;
 
-  bool get isPostSuccessful => _isPostSuccessful;
+  bool get isPostSuccessful => _isPostSuccessful; // Getter for post success status
 
   bool _isPosting = false;
 
-  bool get isPosting => _isPosting;
+  bool get isPosting => _isPosting; // Getter for posting status
 
   void toggleIsPosting(bool value) {
-    _isPosting = value;
-    notifyListeners();
+    _isPosting = value; // Toggle the posting status
+    notifyListeners(); // Notify listeners about the change in posting status
   }
 
-  // Define controllers for  text fields
+  // Define controllers for text fields
   final TextEditingController productCodeController = TextEditingController();
   final TextEditingController productNameController = TextEditingController();
   final TextEditingController productPriceController = TextEditingController();
-  final TextEditingController productDescriptionController =
-      TextEditingController();
+  final TextEditingController productDescriptionController = TextEditingController();
 
   Future<void> selectFile() async {
     try {
@@ -48,7 +47,7 @@ class UploadProductsProvider with ChangeNotifier {
 
         // Assign the selected file to the selectedFile property
         selectedFile = file;
-        notifyListeners();
+        notifyListeners(); // Notify listeners about the selected file
       }
     } catch (e) {
       print("File picking error: $e");
@@ -87,7 +86,7 @@ class UploadProductsProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        _isPostSuccessful = true;
+        _isPostSuccessful = true; // Set post success flag to true
         // Request was successful
         print('Product data posted successfully');
       } else {
@@ -100,13 +99,13 @@ class UploadProductsProvider with ChangeNotifier {
     }
   }
 
-  // Function to clear of controllers and remove the selected image
+  // Function to clear controllers 
   void clearControllers() {
     productCodeController.clear();
     productNameController.clear();
     productPriceController.clear();
     productDescriptionController.clear();
 
-    notifyListeners();
+    notifyListeners(); // Notify listeners about controller clearing
   }
 }

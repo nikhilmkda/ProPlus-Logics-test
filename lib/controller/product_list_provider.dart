@@ -5,14 +5,14 @@ import 'auth_provider.dart';
 
 class ProductListProvider with ChangeNotifier {
   final AuthProvider authProvider;
-  final Dio _dio = Dio(); // Create a Dio instance
+  final Dio _dio = Dio(); // Create a Dio instance for making HTTP requests
   bool hasNetworkError = false;
 
   ProductListProvider(this.authProvider);
 
-  String? get authToken => authProvider.authToken;
+  String? get authToken => authProvider.authToken; // Get the authentication token from the AuthProvider
 
-  List<Product> products = [];
+  List<Product> products = []; // List to store fetched products
 
   Future<void> fetchData() async {
     final authToken = authProvider.authToken;
@@ -49,6 +49,7 @@ class ProductListProvider with ChangeNotifier {
 
             // ignore: unnecessary_type_check
             if (data is List) {
+              // Map the fetched data to Product objects
               products = data.map((productData) {
                 return Product(
                   productCode: productData['ProductCode'],
@@ -59,7 +60,7 @@ class ProductListProvider with ChangeNotifier {
                 );
               }).toList();
 
-              notifyListeners();
+              notifyListeners(); // Notify listeners of a change in the product list
               break; // Break out of the retry loop if successful
             } else {
               print('Invalid data format');

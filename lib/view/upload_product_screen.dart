@@ -367,7 +367,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                               authToken, // Make sure authToken is defined
                         },
                       );
-                      //   print('Post button pressed with authToken: $authToken');
+                     
 
                       // Provide feedback to the user, indicating that the upload task is in progress.
                       ScaffoldMessenger.of(context).showSnackBar(
