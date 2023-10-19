@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../controller/auth_provider.dart';
-import '../controller/upload_products_provider.dart';
+import '../controller/product_create_provider.dart';
 
 class UploadProductScreen extends StatefulWidget {
   const UploadProductScreen({super.key});
@@ -21,7 +21,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
     final postProductsProvider = Provider.of<UploadProductsProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
     if (authProvider.isAuthenticated) {
-      final authToken = authProvider.authToken;
+      // final authToken = authProvider.authToken;
 
       return Scaffold(
         backgroundColor: Colors.white,

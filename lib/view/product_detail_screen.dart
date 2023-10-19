@@ -58,8 +58,8 @@ class ExpandedProduct extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(
-              height: 30,
+            SizedBox(
+              height: screenHeight / 26,
             ),
             Padding(
               padding: const EdgeInsets.all(15),
@@ -71,15 +71,17 @@ class ExpandedProduct extends StatelessWidget {
                           color: Colors.black,
                           fontSize: 25,
                           fontWeight: FontWeight.bold)),
-                  const SizedBox(
-                    height: 28,
+                  SizedBox(
+                    height: screenHeight / 26,
                   ),
                   Text('₹ ${price.toStringAsFixed(2)}',
                       style: TextStyle(
                           color: Colors.red.shade800,
                           fontSize: 25,
                           fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 35),
+                  SizedBox(
+                    height: screenHeight / 26,
+                  ),
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -101,13 +103,17 @@ class ExpandedProduct extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: screenHeight / 40,
+                  ),
                   Container(
                     decoration: const BoxDecoration(
                       border: Border(bottom: BorderSide(color: Colors.black)),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: screenHeight / 40,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -121,8 +127,8 @@ class ExpandedProduct extends StatelessWidget {
                               fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  const SizedBox(
-                    height: 30,
+                  SizedBox(
+                    height: screenHeight / 40,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -154,10 +160,17 @@ class ExpandedProduct extends StatelessWidget {
                           borderRadius: BorderRadius.circular(25),
                         ),
                       ),
-                      child: const Text('Buy Now'),
+                      child: const Text(
+                        'Buy Now',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  SizedBox(
+                    height: screenHeight / 42,
+                  ),
                   SizedBox(
                     width: double.infinity,
                     height: 45,

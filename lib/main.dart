@@ -1,7 +1,7 @@
-import 'package:ecommerce/controller/upload_products_provider.dart';
-import 'package:ecommerce/view/homepage.dart';
+import 'package:ecommerce/controller/product_create_provider.dart';
+import 'package:ecommerce/view/product_list_screen.dart';
 import 'package:ecommerce/view/login_screen.dart';
-import 'package:ecommerce/view/upload_product_screen.dart';
+import 'package:ecommerce/view/product_create_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

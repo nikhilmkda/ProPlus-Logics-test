@@ -1,12 +1,11 @@
-import 'package:ecommerce/view/product_expanded_screen.dart';
+import 'package:ecommerce/view/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
 import '../controller/auth_provider.dart';
 import '../controller/product_list_provider.dart';
-import '../controller/upload_products_provider.dart';
+import '../controller/product_create_provider.dart';
 import 'login_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -232,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                                     height: 10,
                                   ),
                                   Text(
-                                    '${product.mrp}',
+                                    '₹ ${product.mrp}',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
