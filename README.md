@@ -33,8 +33,7 @@ The workmanager.dart file is used to execute background tasks for posting produc
 - [Flutter SDK](https://flutter.dev/)
 - [Cupertino Icons](https://pub.dev/packages/cupertino_icons)
 - [Provider](https://pub.dev/packages/provider)
-
--[sharedpreferences](https://pub.dev/packages/shared_preferences)
+- [sharedpreferences](https://pub.dev/packages/shared_preferences)
 - [File Picker](https://pub.dev/packages/file_picker)
 - [Dio](https://pub.dev/packages/dio)
 - [Workmanager](https://pub.dev/packages/workmanager)
