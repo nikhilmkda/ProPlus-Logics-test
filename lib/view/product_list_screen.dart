@@ -1,3 +1,4 @@
+import 'package:ecommerce/controller/notification_provider.dart';
 import 'package:ecommerce/view/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -58,6 +59,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final notificationProvider = context.watch<NotificationProvider>();
+
     // Access the ProductProvider
     final productProvider = Provider.of<ProductListProvider>(context);
     final uploadProductsProvider = Provider.of<UploadProductsProvider>(context);
@@ -147,7 +150,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 30),
             FutureBuilder(
-              future: productProvider.fetchData(),
+              future: productProvider.fetchDataFromAPIOnce(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -181,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                       .products; // Assuming ProductProvider has a 'products' property
                   return Expanded(
                     child: GridView.builder(
-                      // physics: NeverScrollableScrollPhysics(),
+                      //physics: NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, childAspectRatio: 0.9),
@@ -217,6 +220,8 @@ class _HomePageState extends State<HomePage> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -226,6 +231,8 @@ class _HomePageState extends State<HomePage> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -235,6 +242,8 @@ class _HomePageState extends State<HomePage> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),

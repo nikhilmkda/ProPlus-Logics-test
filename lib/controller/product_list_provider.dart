@@ -5,6 +5,13 @@ import '../model/product_model.dart';
 import 'auth_provider.dart';
 
 class ProductListProvider with ChangeNotifier {
+  Future<List> fetchDataFromAPIOnce() async {
+    if (products.isEmpty) {
+      await fetchData();
+    }
+    return products;
+  }
+
   final AuthProvider authProvider;
   final Dio _dio = Dio(); // Create a Dio instance
   bool hasNetworkError = false;
@@ -24,7 +31,7 @@ class ProductListProvider with ChangeNotifier {
     }
 
     int retryCount = 0;
-    int maxRetries = 5; // Set a maximum number of retries
+    int maxRetries = 3; // Set a maximum number of retries
 
     Future<void> fetchWithRetries() async {
       while (retryCount < maxRetries) {
@@ -61,31 +68,12 @@ class ProductListProvider with ChangeNotifier {
               }).toList();
 
               notifyListeners();
-              break; // Break out of the retry loop if successful
-            } else {
-              print('Invalid data format');
+              break;
             }
-          } else if (response.statusCode == 429) {
-            // Handle 429 error by implementing exponential backoff
-            int delayInSeconds = 2 ^ retryCount;
-            await Future.delayed(Duration(seconds: delayInSeconds));
-            retryCount++;
           } else {
             print('Failed to fetch data. Status code: ${response.statusCode}');
             hasNetworkError = true;
             break; // Stop retrying for other errors
-          }
-        } on DioException catch (e) {
-          if (e.response != null && e.response!.statusCode == 429) {
-            // Handle 429 error by implementing exponential backoff
-            int delayInSeconds = 2 ^ retryCount;
-            await Future.delayed(Duration(seconds: delayInSeconds));
-            retryCount++;
-          } else {
-            // Handle other Dio errors (e.g., network issues, server errors)
-            print('Dio Error: $e');
-            hasNetworkError = true;
-            break; // Stop retrying for other Dio errors
           }
         } catch (e) {
           // Handle other exceptions

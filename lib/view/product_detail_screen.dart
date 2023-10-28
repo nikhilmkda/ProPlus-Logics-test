@@ -47,7 +47,7 @@ class ExpandedProduct extends StatelessWidget {
               height: 250,
               child: Image.network(
                 image,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   // Display a placeholder image or an error message
                   return Image.asset(

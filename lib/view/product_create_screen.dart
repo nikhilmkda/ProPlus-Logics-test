@@ -1,12 +1,36 @@
 import 'dart:io';
 
+import 'package:ecommerce/controller/notification_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_player/video_player.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../controller/auth_provider.dart';
 import '../controller/product_create_provider.dart';
+
+void callbackDispatcher(String task, Map<String, dynamic> inputData) {
+  // Now you can access inputData, including the 'authToken'.
+  final authToken = inputData['authToken'];
+
+  // Check if the authToken is not null before proceeding.
+  if (authToken != null) {
+    // Proceed with the background task using authToken.
+    final uploadProductsProvider = UploadProductsProvider(authToken);
+    // Call the method you need on the uploadProvider.
+    uploadProductsProvider.postProductData();
+    if (uploadProductsProvider.isPostSuccessful == true) {
+      final notificationProvider = NotificationProvider();
+
+      notificationProvider.showNotification(
+        title: 'Success',
+        body: 'Data added successfully',
+      );
+    }
+  }
+}
 
 class UploadProductScreen extends StatefulWidget {
   const UploadProductScreen({super.key});
@@ -18,7 +42,7 @@ class UploadProductScreen extends StatefulWidget {
 class _UploadProductScreenState extends State<UploadProductScreen> {
   @override
   Widget build(BuildContext context) {
-    final postProductsProvider = Provider.of<UploadProductsProvider>(context);
+    final uploadProductsProvider = Provider.of<UploadProductsProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
     if (authProvider.isAuthenticated) {
       // final authToken = authProvider.authToken;
@@ -86,7 +110,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 ),
               ),
               TextField(
-                controller: postProductsProvider.productCodeController,
+                controller: uploadProductsProvider.productCodeController,
                 decoration: InputDecoration(
                   hintText: 'PRDTSLNO125456',
                   hintStyle:
@@ -131,7 +155,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 ])),
               ),
               TextField(
-                controller: postProductsProvider.productNameController,
+                controller: uploadProductsProvider.productNameController,
                 decoration: InputDecoration(
                   hintText: 'Enter your product name',
                   hintStyle:
@@ -176,7 +200,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 ])),
               ),
               TextField(
-                controller: postProductsProvider.productPriceController,
+                controller: uploadProductsProvider.productPriceController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: 'Enter your product price',
@@ -222,7 +246,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 ])),
               ),
               TextField(
-                controller: postProductsProvider.productDescriptionController,
+                controller: uploadProductsProvider.productDescriptionController,
                 decoration: InputDecoration(
                   hintText: 'Add Your Description Here',
                   hintStyle:
@@ -246,7 +270,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
               const SizedBox(
                 height: 40,
               ),
-              if (postProductsProvider.selectedFile != null)
+              if (uploadProductsProvider.image != null ||
+                  uploadProductsProvider.video != null)
                 Align(
                   alignment: Alignment.centerRight,
                   child: SizedBox(
@@ -263,7 +288,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                         ),
                       ),
                       onPressed: () {
-                        postProductsProvider.selectFile();
+                        uploadProductsProvider.showImageOrVideoDialog(context);
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -282,22 +307,33 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                     ),
                   ),
                 ),
-              if (postProductsProvider.selectedFile != null)
+              if (uploadProductsProvider.image != null ||
+                  uploadProductsProvider.video != null)
                 const SizedBox(
                   height: 25,
                 ),
-              if (postProductsProvider.selectedFile != null)
-                SizedBox(
-                  height: 200,
-                  width: double.infinity,
-                  child: Image.file(
-                    File(postProductsProvider.selectedImage ??
-                        ''), // Provide the file path as a string
-                    fit: BoxFit
-                        .cover, // You can adjust the fit as per your requirements
-                  ),
-                ),
-              if (postProductsProvider.selectedFile == null)
+              uploadProductsProvider.image != null
+                  ? Image.file(
+                      File(uploadProductsProvider.image!.path),
+                      fit: BoxFit.cover,
+                      height: 400,
+                      width: double.infinity,
+                    )
+                  : GestureDetector(
+                      child: uploadProductsProvider.videoController != null
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: AspectRatio(
+                                aspectRatio: uploadProductsProvider
+                                    .videoController!.value.aspectRatio,
+                                child: VideoPlayer(
+                                    uploadProductsProvider.videoController!),
+                              ),
+                            )
+                          : Container(),
+                    ),
+              if (uploadProductsProvider.image == null &&
+                  uploadProductsProvider.video == null)
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -312,7 +348,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                       ),
                     ),
                     onPressed: () {
-                      postProductsProvider.selectFile();
+                      uploadProductsProvider.showImageOrVideoDialog(context);
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -339,11 +375,11 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     final productName =
-                        postProductsProvider.productNameController.text;
+                        uploadProductsProvider.productNameController.text;
                     final productPrice =
-                        postProductsProvider.productPriceController.text;
-                    final productDescription =
-                        postProductsProvider.productDescriptionController.text;
+                        uploadProductsProvider.productPriceController.text;
+                    final productDescription = uploadProductsProvider
+                        .productDescriptionController.text;
 
                     if (productName.isEmpty ||
                         productPrice.isEmpty ||
@@ -356,37 +392,35 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                         ),
                       );
                     } else {
-                      //postProductsProvider.postProductData();
-                      // Get the authToken from SharedPreferences
-                      final prefs = await SharedPreferences.getInstance();
-                      final authToken = prefs.getString('auth_token');
-                      Workmanager().registerOneOffTask(
-                        'postProductData',
-                        'simpleTaskKey',
-                        initialDelay: const Duration(
-                            seconds: 10), // Add a delay if needed
-                        inputData: <String, dynamic>{
-                          'authToken':
-                              authToken, // Make sure authToken is defined
-                        },
-                      );
-
                       // Provide feedback to the user, indicating that the upload task is in progress.
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
+                          duration: Duration(milliseconds: 1000),
                           backgroundColor: Colors.blue,
                           content: Text(
                               'Uploading product data in the background...'),
                         ),
                       );
-                      if (postProductsProvider.isPostSuccessful) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            backgroundColor: Colors.green,
-                            content: Text('Uploaded post successfully'),
-                          ),
-                        );
-                      }
+                      // Use the `compute` function to run the background task
+
+                      await uploadProductsProvider.postProductData();
+
+                      // Get the authToken from SharedPreferences
+                      //final prefs = await SharedPreferences.getInstance();
+                    //  final authToken = prefs.getString('auth_token');
+
+                      // Workmanager().registerOneOffTask(
+                      //   'postProductData',
+                      //   'simpleTaskKey',
+                      //   initialDelay: const Duration(
+                      //       seconds: 10), // Add a delay if needed
+                      //   inputData: <String, dynamic>{
+                      //     'authToken':
+                      //         authToken, // Make sure authToken is defined
+                      //   },
+                      // );
+
+                    
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -395,7 +429,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: postProductsProvider.isPosting
+                  child: uploadProductsProvider.isPosting
                       ? const CircularProgressIndicator() // Show a circular progress indicator
                       : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,

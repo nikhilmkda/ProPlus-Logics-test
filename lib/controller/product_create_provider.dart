@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:ecommerce/controller/notification_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 import 'auth_provider.dart';
 
@@ -8,11 +13,24 @@ class UploadProductsProvider with ChangeNotifier {
   final AuthProvider authProvider;
 
   UploadProductsProvider(this.authProvider); // Constructor
-  PlatformFile? selectedFile;
-  String? selectedImage;
-  bool _isPostSuccessful = false;
 
-  bool get isPostSuccessful => _isPostSuccessful; // Getter for post success status
+  bool _isPostSuccessful = false;
+  File? _image;
+  File? _video;
+  VideoPlayerController? _videoController;
+
+  File? get image => _image;
+  File? get video => _video;
+  VideoPlayerController? get videoController => _videoController;
+  void disposeVideoController() {
+    if (_videoController != null) {
+      _videoController!.dispose();
+      _videoController = null;
+    }
+  }
+
+  bool get isPostSuccessful =>
+      _isPostSuccessful; // Getter for post success status
 
   bool _isPosting = false;
 
@@ -27,34 +45,112 @@ class UploadProductsProvider with ChangeNotifier {
   final TextEditingController productCodeController = TextEditingController();
   final TextEditingController productNameController = TextEditingController();
   final TextEditingController productPriceController = TextEditingController();
-  final TextEditingController productDescriptionController = TextEditingController();
+  final TextEditingController productDescriptionController =
+      TextEditingController();
 
-  Future<void> selectFile() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'avi'],
-      );
+  Future<void> selectImageFromDevice(BuildContext context) async {
+    //_video = null;
+    final imageSource = await showDialog<ImageSource>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Select Image Source'),
+        actions: [
+          TextButton(
+            child: Text('Camera'),
+            onPressed: () => Navigator.of(context).pop(ImageSource.camera),
+          ),
+          TextButton(
+            child: Text('Gallery'),
+            onPressed: () => Navigator.of(context).pop(ImageSource.gallery),
+          ),
+        ],
+      ),
+    );
 
-      if (result != null && result.files.isNotEmpty) {
-        PlatformFile file = result.files.single;
-
-        // Check if the selected file is an image based on its extension
-        if (['jpg', 'jpeg', 'png', 'gif'].contains(file.extension)) {
-          // Set the selected image path to the selectedImage property
-          selectedImage = file.path!;
+    if (imageSource != null) {
+      final pickedFile = await ImagePicker().pickImage(source: imageSource);
+      try {
+        if (pickedFile != null) {
+          _image = File(pickedFile.path);
+          // Load and display the image
+          notifyListeners();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.red,
+              content: Text('image error'),
+            ),
+          );
         }
+      } catch (e) {
+        print('Error loading image: $e');
+      }
+    }
+  }
 
-        // Assign the selected file to the selectedFile property
-        selectedFile = file;
-        notifyListeners(); // Notify listeners about the selected file
+  Future<void> selectVideoFromDevice(BuildContext context) async {
+    _image = null;
+    final pickedFile = await ImagePicker().pickVideo(
+      source: ImageSource.gallery,
+      maxDuration: const Duration(minutes: 1), // Adjust duration as needed
+    );
+
+    try {
+      if (pickedFile != null) {
+        disposeVideoController();
+        _video = File(pickedFile.path);
+        _videoController = VideoPlayerController.file(File(pickedFile.path))
+          ..initialize().then((_) {
+            _videoController!.setLooping(false);
+            _videoController!.play();
+            notifyListeners();
+          });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Video selection error'),
+          ),
+        );
       }
     } catch (e) {
-      print("File picking error: $e");
+      print('Error loading video: $e');
+    }
+  }
+
+  Future<void> showImageOrVideoDialog(BuildContext context) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select Image or Video'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, 'image');
+              },
+              child: const Text('Image'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, 'video');
+              },
+              child: const Text('Video'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == 'image') {
+      selectImageFromDevice(context);
+    } else if (result == 'video') {
+      selectVideoFromDevice(context);
     }
   }
 
   Future<void> postProductData() async {
+    print("posting data...");
     try {
       // Get the authToken from the authProvider
       final authToken = authProvider.authToken;
@@ -66,15 +162,32 @@ class UploadProductsProvider with ChangeNotifier {
       }
 
       // Create a FormData object for the request
-      FormData formData = FormData.fromMap({
-        'ProductCode': productCodeController.text,
-        'ProductName': productNameController.text,
-        'MRP': productPriceController.text,
-        'product_description': productDescriptionController.text,
-        'PurchaseRate': '',
-        'SalesRate': '',
-        'ProductImage': await MultipartFile.fromFile(selectedImage!),
-      });
+      FormData formData = FormData();
+
+      formData.fields
+        ..add(MapEntry('ProductCode', productCodeController.text))
+        ..add(MapEntry('ProductName', productNameController.text))
+        ..add(MapEntry('MRP', productPriceController.text))
+        ..add(
+            MapEntry('product_description', productDescriptionController.text))
+        ..add(const MapEntry('PurchaseRate', ''))
+        ..add(const MapEntry('SalesRate', ''));
+
+      if (image != null) {
+        formData.files.add(MapEntry(
+          'ProductImage',
+          await MultipartFile.fromFile(image!.path),
+        ));
+      } else if (videoController != null) {
+        if (video != null) {
+          formData.files.add(MapEntry(
+            'ProductVideo',
+            await MultipartFile.fromFile(video!.path, filename: 'video.mp4'),
+          ));
+        } else {
+          print('video/image file is null');
+        }
+      }
 
       // Send the POST request using Dio with the authToken in the headers
       final response = await Dio().post(
@@ -86,8 +199,13 @@ class UploadProductsProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        _isPostSuccessful = true; // Set post success flag to true
+        _isPostSuccessful = true;
+        NotificationProvider().showNotification(
+          title: 'Upload Success',
+          body: 'Product data uploaded successfully',
+        );
         // Request was successful
+        print(_isPostSuccessful);
         print('Product data posted successfully');
       } else {
         // Handle errors or provide feedback to the user
@@ -99,7 +217,7 @@ class UploadProductsProvider with ChangeNotifier {
     }
   }
 
-  // Function to clear controllers 
+  // Function to clear controllers
   void clearControllers() {
     productCodeController.clear();
     productNameController.clear();
