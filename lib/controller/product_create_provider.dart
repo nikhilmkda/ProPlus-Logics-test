@@ -170,8 +170,8 @@ class UploadProductsProvider with ChangeNotifier {
         ..add(MapEntry('MRP', productPriceController.text))
         ..add(
             MapEntry('product_description', productDescriptionController.text))
-        ..add(const MapEntry('PurchaseRate', ''))
-        ..add(const MapEntry('SalesRate', ''));
+        ..add(const MapEntry('PurchaseRate', '1000'))
+        ..add(const MapEntry('SalesRate', '2000'));
 
       if (image != null) {
         formData.files.add(MapEntry(
@@ -197,22 +197,46 @@ class UploadProductsProvider with ChangeNotifier {
           'Authorization': 'Bearer $authToken',
         }),
       );
+      print('Request URL: ${response.requestOptions.uri}');
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Data: ${response.data}');
 
       if (response.statusCode == 200) {
         _isPostSuccessful = true;
-        NotificationProvider().showNotification(
-          title: 'Upload Success',
-          body: 'Product data uploaded successfully',
-        );
+        final errors = response.data['errors'];
+        if (errors is Map) {
+          // Check if 'errors' is a map
+          final errorMessages = errors.values
+              .expand((messages) => messages)
+              .map((message) => message.toString())
+              .join(', ');
+          NotificationProvider().showNotification(
+              title: 'Upload Status',
+              body: '${response.data['message']}',
+              description: errorMessages);
+        } else {
+          NotificationProvider().showNotification(
+            title: 'Upload Status',
+            body: '${response.data['message']}',
+          );
+        }
+
         // Request was successful
         print(_isPostSuccessful);
         print('Product data posted successfully');
       } else {
-        // Handle errors or provide feedback to the user
+        NotificationProvider().showNotification(
+          title: 'Upload Faild',
+          body: 'Product data uploaded faild. please try again',
+        );
         print(
             'Failed to post product data. Status code: ${response.statusCode}');
       }
     } catch (e) {
+      NotificationProvider().showNotification(
+        title: 'Upload Faild',
+        body: 'Product data uploaded faild. please try again',
+      );
       print('Error posting product data: $e');
     }
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class ExpandedProduct extends StatelessWidget {
   const ExpandedProduct({
@@ -14,13 +15,14 @@ class ExpandedProduct extends StatelessWidget {
   final double price;
   final String description;
   final String id;
-  final String image;
+  final String image; // Assume image is a URL
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         toolbarHeight: 65,
         backgroundColor: Colors.white,
         leading: IconButton(
@@ -35,50 +37,73 @@ class ExpandedProduct extends StatelessWidget {
         title: const Text(
           "Product details",
           style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              width: double.infinity,
-              height: 250,
-              child: Image.network(
-                image,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  // Display a placeholder image or an error message
-                  return Image.asset(
-                    'assets/errorImage.png',
-                    width: double.infinity,
-                    height: 250,
-                  );
-                },
+            
+            if (image.toLowerCase().endsWith('.mp4'))
+              // Display video if the image URL ends with '.mp4'
+              SizedBox(
+                width: double.infinity,
+                height: screenHeight / 3,
+                child: VideoPlayerWidget(videoUrl: image),
+              )
+            else
+              // Display image if it's not a video URL
+              SizedBox(
+                width: double.infinity,
+                height: screenHeight / 3,
+                child: Image.network(
+                  image,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Display a placeholder image or an error message
+                    return Image.asset(
+                      'assets/errorImage.png',
+                      width: double.infinity,
+                      height: screenHeight / 3,
+                    );
+                  },
+                ),
               ),
-            ),
             SizedBox(
-              height: screenHeight / 26,
+              height: screenHeight / 50,
             ),
             Padding(
               padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name,
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   SizedBox(
                     height: screenHeight / 26,
                   ),
-                  Text('₹ ${price.toStringAsFixed(2)}',
-                      style: TextStyle(
-                          color: Colors.red.shade800,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    '₹ ${price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: Colors.red.shade800,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   SizedBox(
                     height: screenHeight / 26,
                   ),
@@ -92,6 +117,8 @@ class ExpandedProduct extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         'posted on 04/08/23',
@@ -100,6 +127,8 @@ class ExpandedProduct extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -119,12 +148,18 @@ class ExpandedProduct extends StatelessWidget {
                     children: [
                       const Text('Product ID - ',
                           style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold)),
-                      Text(id,
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold)),
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          )),
+                      Text(
+                        id,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -135,12 +170,18 @@ class ExpandedProduct extends StatelessWidget {
                     children: [
                       const Text('Description - ',
                           style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold)),
-                      Text(description,
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold)),
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          )),
+                      Text(
+                        description,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -211,5 +252,44 @@ class ExpandedProduct extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  VideoPlayerWidget({required this.videoUrl});
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+      ..initialize().then((_) {
+        setState(() {});
+        _controller.play();
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _controller.value.isInitialized
+        ? AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          )
+        : const CircularProgressIndicator(); // Show loading indicator while video is initializing
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
   }
 }

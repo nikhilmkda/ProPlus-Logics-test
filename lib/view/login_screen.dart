@@ -11,21 +11,18 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenwidth = MediaQuery.of(context).size.width;
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     // Check if the user is already authenticated using shared_preferences
-    final isAuthenticated = authProvider.isAuthenticated;
 
-    if (isAuthenticated) {
-      // Redirect to the homepage if already authenticated
-      Navigator.pushReplacementNamed(context, '/homepage');
-    }
     void handleLogin() {
       final email = emailController.text;
       final password = passwordController.text;
 
       authProvider.login(email, password).then((_) {
         if (authProvider.isAuthenticated) {
+          // Redirect to the homepage after successful login
           Navigator.pushReplacementNamed(context, '/homepage');
         }
       }).catchError((error) {
@@ -47,12 +44,12 @@ class LoginPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 40.0),
+              SizedBox(height: screenHeight / 20),
               Image.asset(
                 'assets/login.jpg', // Replace with your image path
-                width: 450.0,
+                width: screenwidth,
               ),
-              const SizedBox(height: 10.0),
+              SizedBox(height: screenHeight / 40),
               Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
@@ -74,7 +71,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 60.0),
+              SizedBox(height: screenHeight / 13),
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -99,7 +96,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 25.0),
+              SizedBox(height: screenHeight / 30),
               TextField(
                 obscureText: true,
                 controller: passwordController,
@@ -125,7 +122,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20.0),
+              SizedBox(height: screenHeight / 35),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

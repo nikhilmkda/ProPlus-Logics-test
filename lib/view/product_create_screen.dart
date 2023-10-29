@@ -42,6 +42,7 @@ class UploadProductScreen extends StatefulWidget {
 class _UploadProductScreenState extends State<UploadProductScreen> {
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     final uploadProductsProvider = Provider.of<UploadProductsProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
     if (authProvider.isAuthenticated) {
@@ -50,6 +51,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          centerTitle: true,
           toolbarHeight: 65,
           backgroundColor: Colors.white,
           leading: IconButton(
@@ -58,6 +60,10 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
               color: Colors.black,
             ),
             onPressed: () {
+              if (uploadProductsProvider.videoController != null) {
+                uploadProductsProvider.videoController!.pause();
+              }
+
               Navigator.of(context).pop();
             },
           ),
@@ -72,8 +78,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
             padding: const EdgeInsets.all(12.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: screenHeight / 50,
               ),
               Container(
                 width: double.infinity,
@@ -96,8 +102,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 30,
+              SizedBox(
+                height: screenHeight / 26,
               ),
               const Padding(
                 padding: EdgeInsets.only(bottom: 8),
@@ -131,8 +137,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 30,
+              SizedBox(
+                height: screenHeight / 26,
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -176,8 +182,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 30,
+              SizedBox(
+                height: screenHeight / 26,
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -222,8 +228,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 30,
+              SizedBox(
+                height: screenHeight / 26,
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -267,8 +273,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 40,
+              SizedBox(
+                height: screenHeight / 20,
               ),
               if (uploadProductsProvider.image != null ||
                   uploadProductsProvider.video != null)
@@ -309,14 +315,14 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 ),
               if (uploadProductsProvider.image != null ||
                   uploadProductsProvider.video != null)
-                const SizedBox(
-                  height: 25,
+                SizedBox(
+                  height: screenHeight / 26,
                 ),
               uploadProductsProvider.image != null
                   ? Image.file(
                       File(uploadProductsProvider.image!.path),
                       fit: BoxFit.cover,
-                      height: 400,
+                      height: screenHeight / 2,
                       width: double.infinity,
                     )
                   : GestureDetector(
@@ -366,8 +372,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                     ),
                   ),
                 ),
-              const SizedBox(
-                height: 40,
+              SizedBox(
+                height: screenHeight / 20,
               ),
               SizedBox(
                 width: 400.0,
@@ -407,7 +413,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
 
                       // Get the authToken from SharedPreferences
                       //final prefs = await SharedPreferences.getInstance();
-                    //  final authToken = prefs.getString('auth_token');
+                      //  final authToken = prefs.getString('auth_token');
 
                       // Workmanager().registerOneOffTask(
                       //   'postProductData',
@@ -419,8 +425,6 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                       //         authToken, // Make sure authToken is defined
                       //   },
                       // );
-
-                    
                     }
                   },
                   style: ElevatedButton.styleFrom(

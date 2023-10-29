@@ -1,6 +1,11 @@
+import 'dart:async';
+
+import 'package:ecommerce/constants.dart';
 import 'package:ecommerce/controller/notification_provider.dart';
+import 'package:ecommerce/model/product_model.dart';
 import 'package:ecommerce/view/product_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -17,8 +22,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  Completer<void> _refreshCompleter = Completer<void>();
   // Function to build a widget that displays either an image or video
   Widget buildProductImage(String imageUrl) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenwidth = MediaQuery.of(context).size.width;
     if (imageUrl.endsWith('.mp4')) {
       // Display video if the URL ends with '.mp4'
       final videoPlayerController =
@@ -31,14 +42,14 @@ class _HomePageState extends State<HomePage> {
       // Display image for other cases
       return Image.network(
         imageUrl,
-        width: 150,
-        height: 100,
+        width: screenwidth / 2,
+        height: screenHeight / 7,
         errorBuilder: (context, error, stackTrace) {
           // Display a placeholder image or an error message
           return Image.asset(
             'assets/errorImage.png',
-            width: 150,
-            height: 100,
+            width: screenwidth / 2,
+            height: screenHeight / 7,
           );
         },
       );
@@ -51,6 +62,14 @@ class _HomePageState extends State<HomePage> {
     await productProvider.fetchData();
   }
 
+  Future<void> _refreshData() async {
+    final productProvider =
+        Provider.of<ProductListProvider>(context, listen: false);
+    await productProvider.fetchDataFromAPIOnce(); // Refresh the data
+    _refreshCompleter.complete();
+    _refreshCompleter = Completer<void>(); // Create a new Completer
+  }
+
   @override
   void initState() {
     super.initState();
@@ -59,39 +78,31 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenwidth = MediaQuery.of(context).size.width;
     final notificationProvider = context.watch<NotificationProvider>();
 
     // Access the ProductProvider
     final productProvider = Provider.of<ProductListProvider>(context);
     final uploadProductsProvider = Provider.of<UploadProductsProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
+    //final productProvider = context.watch<ProductListProvider>();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        centerTitle: true,
         toolbarHeight: 65,
         backgroundColor: Colors.white,
         actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.black,
-            ),
-            onPressed: () async {
-              authProvider.logout();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
-            },
-          ),
           IconButton(
             icon: const Icon(
               Icons.replay_outlined,
               color: Colors.black,
             ),
             onPressed: () {
-              initData(context);
+              //_refreshData();
+              Navigator.pushNamed(context, '/homepage');
             },
           ),
           IconButton(
@@ -107,11 +118,15 @@ class _HomePageState extends State<HomePage> {
         ],
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back_ios_new,
+            Icons.logout,
             color: Colors.black,
           ),
-          onPressed: () {
-            Navigator.of(context).pop();
+          onPressed: () async {
+            authProvider.logout();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
           },
         ),
         title: const Text(
@@ -120,11 +135,17 @@ class _HomePageState extends State<HomePage> {
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: () {
+          _refreshIndicatorKey.currentState?.show();
+          return _refreshData();
+        },
         child: Column(
           children: [
-            const SizedBox(height: 30),
+            SizedBox(
+              height: screenHeight / 25,
+            ),
             TextField(
               decoration: InputDecoration(
                 hintText: 'search for car models/brands',
@@ -148,46 +169,33 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(
+              height: screenHeight / 25,
+            ),
             FutureBuilder(
               future: productProvider.fetchDataFromAPIOnce(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError ||
-                    productProvider.hasNetworkError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/noresult.png',
-                          width: 400,
-                          height: 400,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          productProvider.hasNetworkError
-                              ? 'Failed to load data, check your internet connection'
-                              : 'Error: ${snapshot.error}',
-                          style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                  return const Center(
+                    child: SizedBox(
+                      height: 30,
+                      width: 100,
+                      child: LoadingIndicator(
+                        indicatorType: Indicator.ballRotateChase,
+                        colors: kDefaultRainbowColors,
+                      ),
                     ),
                   );
-                } else {
+                } else if (snapshot.hasData) {
                   // Build the grid view using the fetched data
-                  final products = productProvider
-                      .products; // Assuming ProductProvider has a 'products' property
+                  final products = snapshot.data as List<Product>;
+
                   return Expanded(
                     child: GridView.builder(
                       //physics: NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, childAspectRatio: 0.9),
+                              crossAxisCount: 2, childAspectRatio: 0.8),
                       itemCount: products.length,
                       itemBuilder: (context, index) {
                         final product = products[index];
@@ -215,6 +223,9 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   buildProductImage(product.productImage),
+                                  SizedBox(
+                                    height: screenHeight / 65,
+                                  ),
                                   Text(
                                     product.productCode,
                                     style: const TextStyle(
@@ -223,8 +234,8 @@ class _HomePageState extends State<HomePage> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  const SizedBox(
-                                    height: 10,
+                                  SizedBox(
+                                    height: screenHeight / 65,
                                   ),
                                   Text(
                                     product.productName,
@@ -234,8 +245,8 @@ class _HomePageState extends State<HomePage> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  const SizedBox(
-                                    height: 10,
+                                  SizedBox(
+                                    height: screenHeight / 65,
                                   ),
                                   Text(
                                     '₹ ${product.mrp}',
@@ -253,7 +264,48 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/noresult.png',
+                          width: screenwidth,
+                          height: screenHeight / 2,
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Failed to load data, check your internet connection',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  );
                 }
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/noresult.png',
+                        width: screenwidth,
+                        height: screenHeight / 2,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Failed to load data, check your internet connection',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],
