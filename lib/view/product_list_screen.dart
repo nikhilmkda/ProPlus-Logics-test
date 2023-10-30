@@ -50,6 +50,7 @@ class _HomePageState extends State<HomePage> {
             'assets/errorImage.png',
             width: screenwidth / 2,
             height: screenHeight / 7,
+            
           );
         },
       );
@@ -141,130 +142,160 @@ class _HomePageState extends State<HomePage> {
           _refreshIndicatorKey.currentState?.show();
           return _refreshData();
         },
-        child: Column(
-          children: [
-            SizedBox(
-              height: screenHeight / 25,
-            ),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'search for car models/brands',
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade800,
-                  size: 25, // Customize the icon color
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              SizedBox(
+                height: screenHeight / 25,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'search for car models/brands',
+                  hintStyle:
+                      TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 18, horizontal: 25),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 2),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide:
+                        BorderSide(color: Colors.grey.shade300, width: 2),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.grey.shade800,
+                    size: 25, // Customize the icon color
+                  ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: screenHeight / 25,
-            ),
-            FutureBuilder(
-              future: productProvider.fetchDataFromAPIOnce(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: SizedBox(
-                      height: 30,
-                      width: 100,
-                      child: LoadingIndicator(
-                        indicatorType: Indicator.ballRotateChase,
-                        colors: kDefaultRainbowColors,
+              SizedBox(
+                height: screenHeight / 25,
+              ),
+              FutureBuilder(
+                future: productProvider.fetchDataFromAPIOnce(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: SizedBox(
+                        height: 30,
+                        width: 100,
+                        child: LoadingIndicator(
+                          indicatorType: Indicator.ballRotateChase,
+                          colors: kDefaultRainbowColors,
+                        ),
                       ),
-                    ),
-                  );
-                } else if (snapshot.hasData) {
-                  // Build the grid view using the fetched data
-                  final products = snapshot.data as List<Product>;
+                    );
+                  } else if (snapshot.hasData) {
+                    // Build the grid view using the fetched data
+                    final products = snapshot.data as List<Product>;
 
-                  return Expanded(
-                    child: GridView.builder(
-                      //physics: NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, childAspectRatio: 0.8),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        final product = products[index];
-                        return GestureDetector(
-                          onTap: () {
-                            // Navigate to a custom widget for displaying full details
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ExpandedProduct(
-                                  description: product.description,
-                                  id: product.productCode,
-                                  name: product.productName,
-                                  price: product.mrp,
-                                  image: product.productImage,
+                    return Expanded(
+                      child: GridView.builder(
+                        //physics: NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.75,
+                          crossAxisSpacing: 10.0,
+                          mainAxisSpacing: 10.0,
+                        ),
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return GestureDetector(
+                            onTap: () {
+                              // Navigate to a custom widget for displaying full details
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ExpandedProduct(
+                                    description: product.description,
+                                    id: product.productCode,
+                                    name: product.productName,
+                                    price: product.mrp,
+                                    image: product.productImage,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              elevation: 3, // Add shadow to the Card
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    buildProductImage(product.productImage),
+                                    SizedBox(
+                                      height: screenHeight / 65,
+                                    ),
+                                    Text(
+                                      product.productCode,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(
+                                      height: screenHeight / 65,
+                                    ),
+                                    Text(
+                                      product.productName,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(
+                                      height: screenHeight / 65,
+                                    ),
+                                    Text(
+                                      '₹ ${product.mrp}',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                          child: Card(
-                            elevation: 3, // Add shadow to the Card
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  buildProductImage(product.productImage),
-                                  SizedBox(
-                                    height: screenHeight / 65,
-                                  ),
-                                  Text(
-                                    product.productCode,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(
-                                    height: screenHeight / 65,
-                                  ),
-                                  Text(
-                                    product.productName,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(
-                                    height: screenHeight / 65,
-                                  ),
-                                  Text(
-                                    '₹ ${product.mrp}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
                             ),
+                          );
+                        },
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/noresult.png',
+                            width: screenwidth,
+                            height: screenHeight / 2,
                           ),
-                        );
-                      },
-                    ),
-                  );
-                } else if (snapshot.hasError) {
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Failed to load data, check your internet connection',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -285,30 +316,10 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   );
-                }
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/noresult.png',
-                        width: screenwidth,
-                        height: screenHeight / 2,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Failed to load data, check your internet connection',
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

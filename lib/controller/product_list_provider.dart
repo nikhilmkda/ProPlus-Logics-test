@@ -49,7 +49,7 @@ class ProductListProvider with ChangeNotifier {
           },
         ),
       );
-      //   print('Response data: ${response.data}');
+      print('Response data: ${response.data}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = response.data;
@@ -59,11 +59,11 @@ class ProductListProvider with ChangeNotifier {
         if (data is List) {
           products = data.map((productData) {
             return Product(
-              productCode: productData['ProductCode'],
-              productName: productData['ProductName'],
-              mrp: productData['SalesRate'].toDouble(),
-              description: 'Product description',
-              productImage: productData['ProductImage'],
+              productCode: productData['ProductCode'] ?? 'Not Found!',
+              productName: productData['ProductName'] ?? 'Not Found!',
+              mrp: productData['SalesRate'].toDouble() ?? 'Not Found!',
+              description: productData['description'] ?? 'Not Found!',
+              productImage: productData['ProductImage'] ?? 'Not Found!',
             );
           }).toList();
 

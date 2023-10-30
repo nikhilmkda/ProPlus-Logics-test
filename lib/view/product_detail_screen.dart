@@ -47,7 +47,6 @@ class ExpandedProduct extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            
             if (image.toLowerCase().endsWith('.mp4'))
               // Display video if the image URL ends with '.mp4'
               SizedBox(
