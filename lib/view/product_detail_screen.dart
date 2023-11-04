@@ -52,7 +52,7 @@ class ExpandedProduct extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 height: screenHeight / 3,
-                child: VideoPlayerWidget(videoUrl: image),
+                child: Center(child: VideoPlayerWidget(videoUrl: image)),
               )
             else
               // Display image if it's not a video URL

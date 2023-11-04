@@ -34,8 +34,9 @@ class _HomePageState extends State<HomePage> {
       // Display video if the URL ends with '.mp4'
       final videoPlayerController =
           VideoPlayerController.networkUrl(Uri.parse(imageUrl));
+      videoPlayerController.initialize();
       return AspectRatio(
-        aspectRatio: 16 / 9, // Adjust the aspect ratio as needed
+        aspectRatio: 16 / 12, 
         child: VideoPlayer(videoPlayerController),
       );
     } else {
@@ -50,7 +51,6 @@ class _HomePageState extends State<HomePage> {
             'assets/errorImage.png',
             width: screenwidth / 2,
             height: screenHeight / 7,
-            
           );
         },
       );
@@ -183,12 +183,15 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
-                      child: SizedBox(
-                        height: 30,
-                        width: 100,
-                        child: LoadingIndicator(
-                          indicatorType: Indicator.ballRotateChase,
-                          colors: kDefaultRainbowColors,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 250),
+                        child: SizedBox(
+                          height: 30,
+                          width: 100,
+                          child: LoadingIndicator(
+                            indicatorType: Indicator.ballRotateChase,
+                            colors: kDefaultRainbowColors,
+                          ),
                         ),
                       ),
                     );
@@ -202,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.75,
+                          childAspectRatio: 0.73,
                           crossAxisSpacing: 10.0,
                           mainAxisSpacing: 10.0,
                         ),
@@ -225,48 +228,51 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               );
                             },
-                            child: Card(
-                              elevation: 3, // Add shadow to the Card
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    buildProductImage(product.productImage),
-                                    SizedBox(
-                                      height: screenHeight / 65,
-                                    ),
-                                    Text(
-                                      product.productCode,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(
-                                      height: screenHeight / 65,
-                                    ),
-                                    Text(
-                                      product.productName,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(
-                                      height: screenHeight / 65,
-                                    ),
-                                    Text(
-                                      '₹ ${product.mrp}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
+                            child: Expanded(
+                              child: Card(
+                                elevation: 3, // Add shadow to the Card
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      buildProductImage(product.productImage),
+                                      SizedBox(
+                                        height: 12,
+                                      ),
+                                      Text(
+                                        product.productCode,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(
+                                        height: 12,
+                                      ),
+                                      Text(
+                                        product.productName,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(
+                                        height: 12,
+                                      ),
+                                      Text(
+                                        '₹ ${product.mrp}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
